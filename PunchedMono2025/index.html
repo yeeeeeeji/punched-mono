@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PunchedMono</title>
+
+    <!-- CSS 외부 연결 -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body id="main-body">
+
+    <header>
+      <div
+        class="logo"
+        id="logo-toggle"
+        role="button"
+        tabindex="0"
+        aria-expanded="false"
+      >
+        PUNCHED MONO
+      </div>
+
+      <div class="controls">
+        <div class="size-control">
+          <span>SCALE</span>
+          <input type="range" id="size-slider" min="10" max="400" value="100" />
+          <span id="size-value" class="size-value">100px</span>
+        </div>
+
+        <div class="action-buttons">
+          <button id="style-toggle">STYLE00</button>
+          <button id="save-btn">SAVE IMAGE</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="capture-area">
+      <section id="punched-card" aria-label="IBM-style punched card layout">
+
+        <div class="card-grid" aria-hidden="true"></div>
+
+        <div id="editor" contenteditable="true" spellcheck="false">
+          PunchedMono
+        </div>
+
+        <div class="card-bottom">
+          This typeface draws from the structural rhythm of punched cards, one of the earliest ways humans stored information through absence. Instead of drawing lines or strokes, each letter takes shape by removing parts of a grid. A character is defined not by what is added, but by what is taken away.
+          Absence is the principle here. A hole becomes a signal. Empty space carries meaning. The grid stays constant; only the removals differ, and from those removals, language emerges.
+          <br />
+          IBM punched card format (1928)
+        </div>
+
+      </section>
+    </main>
+
+    <section id="glyph-screen" aria-hidden="true">
+      <div class="glyph-head">
+        <span></span>
+      </div>
+
+      <div class="glyph-sets">
+
+        <div class="glyph-set" id="glyph-set-default">
+          <div class="glyph-title">style 00</div>
+          <div class="glyph-grid" id="glyph-grid-default"></div>
+        </div>
+
+        <div class="glyph-set" id="glyph-set-alt">
+          <div class="glyph-title">style 01</div>
+          <div class="glyph-grid" id="glyph-grid-alt"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- JS 외부 연결 -->
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+    <script src="script.js"></script>
+
+  </body>
+</html>

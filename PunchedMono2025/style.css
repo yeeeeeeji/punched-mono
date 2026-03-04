@@ -1,0 +1,544 @@
+@font-face {
+  font-family: "PunchedMono";
+  src: url("Yeji_01-Regular.otf") format("opentype");
+}
+
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --font-feature: "ss01" 0;
+  --unit-vw: 0.069444vw;
+  --font-size: calc(100 * var(--unit-vw));
+  --glyph-size: calc(24 * var(--unit-vw));
+  --glyph-cell-size: calc(42 * var(--unit-vw));
+  --glyph-gap: calc(6 * var(--unit-vw));
+  --button-font-size: 0.6rem;
+  --info-size: 0.72rem;
+  --card-ratio: 187 / 83;
+  --grid-col: calc(24 * var(--unit-vw));
+  --grid-row: calc(24 * var(--unit-vw));
+  --stroke: calc(1 * var(--unit-vw));
+  --card-outline-shape: polygon(
+    2.9% 0%,
+    97.1% 0%,
+    100% 3.8%,
+    100% 96.2%,
+    97.1% 100%,
+    2.9% 100%,
+    0% 96.2%,
+    0% 3.8%
+  );
+  --rounded-shadow: none;
+  --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.inverted {
+  --bg: #000000;
+  --fg: #ffffff;
+  --font-feature: "ss01" 1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: "PunchedMono", monospace;
+  font-feature-settings: var(--font-feature);
+  height: 100vh;
+  overflow: hidden;
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    font-feature-settings var(--transition);
+  cursor: pointer;
+}
+
+header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(26 * var(--unit-vw) + 2.5vw);
+  padding: 0 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 200;
+  pointer-events: none;
+}
+
+header * {
+  pointer-events: auto;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 3rem;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--bg);
+}
+
+#font-info {
+  position: fixed;
+  top: calc(62 * var(--unit-vw));
+  left: 2rem;
+  max-width: calc(340 * var(--unit-vw));
+  padding: 0.9rem 1rem;
+  border: var(--stroke) solid var(--fg);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: var(--info-size);
+  line-height: 1.6;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(-8 * var(--unit-vw)));
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s ease;
+  z-index: 120;
+  pointer-events: none;
+}
+
+#font-info.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(8 * var(--unit-vw));
+}
+
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--unit-vw));
+  font-family: "PunchedMono", monospace;
+  font-feature-settings: var(--font-feature);
+  font-size: var(--info-size);
+  letter-spacing: 0.1em;
+  color: var(--bg);
+}
+
+.size-value {
+  min-width: 4ch;
+  text-align: right;
+  font-family: "PunchedMono", monospace;
+  font-feature-settings: var(--font-feature);
+  color: var(--bg);
+}
+
+input[type="range"] {
+  width: calc(150 * var(--unit-vw) + 3vw);
+  height: var(--stroke);
+  -webkit-appearance: none;
+  background: var(--bg);
+  outline: none;
+  cursor: ew-resize;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: calc(12 * var(--unit-vw));
+  height: calc(12 * var(--unit-vw));
+  background: var(--bg);
+  border-radius: 0;
+}
+
+#capture-area {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  padding: calc(16 * var(--unit-vw));
+  overflow: hidden;
+}
+
+#punched-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  clip-path: var(--card-outline-shape);
+  box-shadow: none;
+  background: var(--fg);
+  color: var(--bg);
+  padding: calc(94 * var(--unit-vw)) 5% 4.2%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  overflow-y: auto;
+}
+
+#punched-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: var(--card-outline-shape);
+  box-shadow: inset 0 0 0 var(--stroke) color-mix(in srgb, var(--bg) 30%, transparent);
+  pointer-events: none;
+  z-index: 5;
+}
+
+
+
+.card-grid {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 21%;
+  bottom: 12%;
+  border-top: none;
+  border-bottom: none;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--bg) 14%, transparent) calc(var(--stroke) * 0.8),
+    transparent calc(var(--stroke) * 1.2)
+  );
+  background-size: var(--grid-col) var(--grid-row);
+  pointer-events: none;
+}
+
+#editor {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 100%;
+  outline: none;
+  font-family: "PunchedMono";
+  font-size: var(--font-size);
+  color: var(--bg);
+  text-align: center;
+  line-height: 1;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  margin-top: auto;
+  margin-bottom: auto;
+  padding: 0 4%;
+  transition: font-feature-settings var(--transition);
+}
+
+button {
+  position: relative;
+  background: transparent;
+  color: var(--bg);
+  border: var(--stroke) solid color-mix(in srgb, var(--bg) 65%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.48rem 0.86rem;
+  font-family: "PunchedMono", monospace;
+  font-feature-settings: var(--font-feature);
+  font-size: var(--info-size);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 0.2s,
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: none;
+  pointer-events: none;
+}
+
+button:hover {
+  background: color-mix(in srgb, var(--bg) 12%, transparent);
+  color: var(--bg);
+}
+
+button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.info-text {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: var(--info-size);
+  line-height: 1.6;
+  max-width: calc(300 * var(--unit-vw));
+}
+
+.action-buttons {
+  display: flex;
+  gap: calc(8 * var(--unit-vw));
+}
+
+.card-bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  margin-top: auto;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-align: right;
+}
+
+#glyph-screen {
+  position: fixed;
+  top: calc(16 * var(--unit-vw));
+  bottom: auto;
+  left: calc(16 * var(--unit-vw));
+  right: calc(16 * var(--unit-vw));
+  clip-path: var(--card-outline-shape);
+  box-shadow: none;
+  background: var(--fg);
+  color: var(--bg);
+  padding: calc(94 * var(--unit-vw)) 5% 4.2%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  overflow-y: auto;
+  max-height: calc(100vh - (calc(16 * var(--unit-vw)) + 2rem));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  z-index: 150;
+}
+
+#glyph-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: var(--card-outline-shape);
+  box-shadow: inset 0 0 0 var(--stroke) color-mix(in srgb, var(--bg) 35%, transparent);
+  pointer-events: none;
+}
+
+body.glyph-open #glyph-screen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+body.glyph-open #capture-area {
+  visibility: hidden;
+}
+
+.glyph-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.glyph-close {
+  border-radius: 0;
+  width: calc(32 * var(--unit-vw));
+  height: calc(32 * var(--unit-vw));
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glyph-close::before {
+  display: none;
+}
+
+.glyph-close svg {
+  width: 58%;
+  height: 58%;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.glyph-sets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.glyph-set {
+  border: var(--stroke) solid color-mix(in srgb, var(--fg) 25%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.7rem;
+}
+
+.glyph-title {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.56rem;
+  letter-spacing: 0.09em;
+  margin-bottom: 0.6rem;
+}
+
+.glyph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--glyph-cell-size), var(--glyph-cell-size)));
+  gap: var(--glyph-gap);
+  justify-content: start;
+}
+
+.glyph-cell {
+  border: var(--stroke) solid color-mix(in srgb, var(--fg) 20%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+  width: var(--glyph-cell-size);
+  min-height: var(--glyph-cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--glyph-size);
+  line-height: 1;
+}
+
+.glyph-cell.space {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 900px) {
+  header {
+    top: calc(18 * var(--unit-vw) + 5vw);
+    padding: 0 1.2rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    gap: calc(6 * var(--unit-vw));
+  }
+
+  .logo {
+    font-size: 2.4rem;
+    text-align: center;
+  }
+
+  .controls {
+    align-items: center;
+  }
+
+  #capture-area {
+    padding: calc(8 * var(--unit-vw));
+  }
+
+  #punched-card {
+    padding: calc(86 * var(--unit-vw)) 5% 4.2%;
+    min-height: 100%;
+  }
+
+  .card-top,
+  .card-bottom {
+    font-size: 0.52rem;
+  }
+
+  #editor {
+    line-height: 0.96;
+  }
+
+  #glyph-screen {
+    left: calc(8 * var(--unit-vw));
+    right: calc(8 * var(--unit-vw));
+    top: calc(24 * var(--unit-vw));
+  }
+
+  .glyph-sets {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* html2canvas 캡처 중일 때: color-mix만 우회 (상태는 그대로 유지) */
+body.capturing #punched-card::before {
+  /* 원래: color-mix(in srgb, var(--bg) 30%, transparent) */
+  box-shadow: inset 0 0 0 var(--stroke) rgba(0, 0, 0, 0.3);
+}
+
+/* inverted일 때는 bg가 검정이니까, 테두리는 흰 느낌이 나야 함 */
+body.capturing.inverted #punched-card::before {
+  box-shadow: inset 0 0 0 var(--stroke) rgba(255, 255, 255, 0.3);
+}
+
+body.capturing #glyph-screen::before {
+  /* 원래: color-mix(in srgb, var(--bg) 35%, transparent) */
+  box-shadow: inset 0 0 0 var(--stroke) rgba(0, 0, 0, 0.35);
+}
+
+body.capturing.inverted #glyph-screen::before {
+  box-shadow: inset 0 0 0 var(--stroke) rgba(255, 255, 255, 0.35);
+}
+
+body.capturing .card-grid {
+  /* 원래: color-mix(in srgb, var(--bg) 14%, transparent) */
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.14) calc(var(--stroke) * 0.8),
+    transparent calc(var(--stroke) * 1.2)
+  );
+}
+
+body.capturing.inverted .card-grid {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.14) calc(var(--stroke) * 0.8),
+    transparent calc(var(--stroke) * 1.2)
+  );
+}
+
+body.capturing button {
+  /* 원래: color-mix(in srgb, var(--bg) 65%, transparent) */
+  border-color: rgba(0, 0, 0, 0.65);
+}
+
+body.capturing.inverted button {
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+body.capturing .glyph-set {
+  /* 원래: color-mix(in srgb, var(--fg) 25%, transparent) */
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+body.capturing.inverted .glyph-set {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+body.capturing .glyph-cell {
+  /* 원래: color-mix(in srgb, var(--fg) 20%, transparent) */
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.capturing.inverted .glyph-cell {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.capturing button:hover {
+  /* 원래: color-mix(in srgb, var(--bg) 12%, transparent) */
+  background: rgba(0, 0, 0, 0.12);
+}
+
+body.capturing.inverted button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
